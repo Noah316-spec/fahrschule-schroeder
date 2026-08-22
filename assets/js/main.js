@@ -149,6 +149,58 @@
     });
   }
 
+  /* ---------- Lesefortschritt oben ---------- */
+  var bar = document.querySelector("#progress span");
+  if (bar) {
+    var updateBar = function () {
+      var el = document.documentElement;
+      var max = el.scrollHeight - el.clientHeight;
+      bar.style.width = (max > 0 ? (el.scrollTop / max) * 100 : 0) + "%";
+    };
+    window.addEventListener("scroll", updateBar, { passive: true });
+    window.addEventListener("resize", updateBar);
+    updateBar();
+  }
+
+  /* ---------- Verkehrszeichen im Hero: leichtes Parallax ---------- */
+  var signs = [].slice.call(document.querySelectorAll(".hsign"));
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (signs.length && !reduced && window.matchMedia("(min-width: 941px)").matches) {
+    var hero = document.querySelector(".hero");
+    var mx = 0, my = 0, sy = 0, ticking = false;
+
+    var render = function () {
+      signs.forEach(function (el) {
+        var d = parseFloat(el.getAttribute("data-depth")) || 12;
+        var x = mx * d;
+        var y = my * d + sy * (d / 22);
+        el.style.transform = "translate3d(" + x.toFixed(1) + "px," + y.toFixed(1) + "px,0)";
+      });
+      ticking = false;
+    };
+
+    var request = function () {
+      if (!ticking) { ticking = true; window.requestAnimationFrame(render); }
+    };
+
+    hero.addEventListener("mousemove", function (e) {
+      var r = hero.getBoundingClientRect();
+      mx = (e.clientX - r.left) / r.width - 0.5;
+      my = (e.clientY - r.top) / r.height - 0.5;
+      request();
+    });
+
+    hero.addEventListener("mouseleave", function () { mx = 0; my = 0; request(); });
+
+    window.addEventListener("scroll", function () {
+      sy = Math.min(window.scrollY, 900);
+      request();
+    }, { passive: true });
+
+    request();
+  }
+
   /* ---------- Jahreszahl im Footer ---------- */
   var year = document.getElementById('jahr');
   if (year) year.textContent = new Date().getFullYear();

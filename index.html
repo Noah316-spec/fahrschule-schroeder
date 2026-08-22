@@ -72,6 +72,7 @@
 </head>
 <body>
 <a class="skip" href="#main">Zum Inhalt springen</a>
+<div class="progress" id="progress" aria-hidden="true"><span></span></div>
 
 <!-- Entwurfs-Hinweis: vor dem Livegang entfernen (zusammen mit dem robots-Meta-Tag). -->
 <div class="draft">
@@ -95,6 +96,46 @@
     <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M12.5 5.5 19 12l-6.5 6.5"/></symbol>
     <symbol id="i-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V6M5.5 12.5 12 6l6.5 6.5"/></symbol>
     <symbol id="i-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1.3" fill="currentColor" stroke="none"/><circle cx="4.5" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="4.5" cy="18" r="1.3" fill="currentColor" stroke="none"/></symbol>
+
+    <!-- ---------- Verkehrszeichen (nachgezeichnet, skalieren verlustfrei) ---------- -->
+    <symbol id="sign-stop" viewBox="0 0 100 100">
+      <path d="M29.3 2h41.4L98 29.3v41.4L70.7 98H29.3L2 70.7V29.3Z" fill="#c1121f"/>
+      <path d="M29.3 2h41.4L98 29.3v41.4L70.7 98H29.3L2 70.7V29.3Z" fill="none" stroke="#fff" stroke-width="6"/>
+      <text x="50" y="50" text-anchor="middle" dominant-baseline="central" fill="#fff" font-family="Inter,Arial,sans-serif" font-weight="800" font-size="27" letter-spacing="1">STOP</text>
+    </symbol>
+    <symbol id="sign-priority" viewBox="0 0 100 100">
+      <path d="M50 2 98 50 50 98 2 50Z" fill="#fff"/>
+      <path d="M50 15.5 84.5 50 50 84.5 15.5 50Z" fill="#f2c31d"/>
+    </symbol>
+    <symbol id="sign-yield" viewBox="0 0 100 100">
+      <path d="M3 12h94L50 94Z" fill="#c1121f"/>
+      <path d="M20.5 24.5h59L50 76Z" fill="#fff"/>
+    </symbol>
+    <symbol id="sign-30" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="48" fill="#fff"/>
+      <circle cx="50" cy="50" r="42" fill="none" stroke="#c1121f" stroke-width="12"/>
+      <text x="50" y="52" text-anchor="middle" dominant-baseline="central" fill="#1a1a1a" font-family="Inter,Arial,sans-serif" font-weight="800" font-size="42">30</text>
+    </symbol>
+    <symbol id="sign-roundabout" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="48" fill="#1b3a8f"/>
+      <g fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round">
+        <path d="M50 26a24 24 0 1 1-20.8 12"/>
+      </g>
+      <path d="M50 18l10 9-10 9Z" fill="#fff"/>
+      <path d="M24 62l-2-13 12 5Z" fill="#fff"/>
+    </symbol>
+    <symbol id="sign-arrow" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="48" fill="#1b3a8f"/>
+      <path d="M50 22v46M50 22l-14 14M50 22l14 14" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <symbol id="sign-lights" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="48" fill="#fff"/>
+      <circle cx="50" cy="50" r="42" fill="none" stroke="#c1121f" stroke-width="11"/>
+      <rect x="38" y="20" width="24" height="60" rx="8" fill="#1a1a1a"/>
+      <circle cx="50" cy="33" r="7" fill="#e0322b"/>
+      <circle cx="50" cy="50" r="7" fill="#f2c31d"/>
+      <circle cx="50" cy="67" r="7" fill="#34a35a"/>
+    </symbol>
   </defs>
 </svg>
 
@@ -133,8 +174,14 @@
         <path d="M-60 470C220 400 380 520 660 430S1080 330 1260 380"/>
         <path d="M-60 528C220 458 380 578 660 488S1080 388 1260 438"/>
       </g>
-      <path d="M-60 499C220 429 380 549 660 459S1080 359 1260 409" fill="none" stroke="#ffe08a" stroke-opacity=".38" stroke-width="4" stroke-dasharray="22 20" stroke-linecap="round"/>
+      <path id="roadLine" d="M-60 499C220 429 380 549 660 459S1080 359 1260 409" fill="none" stroke="#ffe08a" stroke-opacity=".38" stroke-width="4" stroke-dasharray="22 20" stroke-linecap="round"/>
     </svg>
+
+    <!-- Schwebende Verkehrszeichen mit leichtem Parallax-Effekt -->
+    <div class="hero__signs" aria-hidden="true">
+      <span class="hsign hsign--a" data-depth="16"><span class="hsign__in"><svg viewBox="0 0 100 100"><use href="#sign-priority"/></svg></span></span>
+      <span class="hsign hsign--b" data-depth="26"><span class="hsign__in"><svg viewBox="0 0 100 100"><use href="#sign-30"/></svg></span></span>
+    </div>
     <div class="hero__inner">
       <div>
         <span class="eyebrow">Fahrschule in Baunatal-Altenbauna</span>
@@ -241,10 +288,13 @@
     </div>
   </section>
 
+  <div class="roadstrip" aria-hidden="true"></div>
+
   <!-- ===================== UND SO GEHT'S ===================== -->
   <section class="section section--soft" id="ablauf">
     <div class="wrap">
       <div class="section__head reveal">
+        <svg class="headsign" viewBox="0 0 100 100" aria-hidden="true"><use href="#sign-lights"/></svg>
         <span class="eyebrow">Und so geht&rsquo;s</span>
         <h2>Ablauf und Fragen zum Führerschein</h2>
         <p class="lede">Auf der Basis der gesetzlichen Bestimmungen bieten wir Euch ein seit Jahren bewährtes und gut funktionierendes Ausbildungsprogramm an. So bekommt Ihr Euren Führerschein:</p>
@@ -298,6 +348,7 @@
   <section class="section" id="klassen">
     <div class="wrap">
       <div class="section__head reveal">
+        <svg class="headsign" viewBox="0 0 100 100" aria-hidden="true"><use href="#sign-stop"/></svg>
         <span class="eyebrow">Führerscheinklassen für PKW</span>
         <h2>Wir bilden in diesen Führerscheinklassen aus</h2>
         <p class="lede">Klasse B, Klasse B in Verbindung mit Schlüsselzahl 96 und Klasse BE &ndash; jeweils mit allen Details zu Mindestalter, Voraussetzungen und Geltungsdauer. Die ausführlichen Informationsblätter könnt Ihr direkt als PDF herunterladen.</p>
@@ -306,6 +357,7 @@
       <div class="classes reveal">
 
         <article class="cls">
+          <svg class="cls__watermark" viewBox="0 0 100 100" aria-hidden="true"><use href="#sign-arrow"/></svg>
           <span class="cls__badge">Klasse B</span>
           <h3>PKW bis 3.500 kg</h3>
           <div class="cls__desc">
@@ -328,6 +380,7 @@
         </article>
 
         <article class="cls">
+          <svg class="cls__watermark" viewBox="0 0 100 100" aria-hidden="true"><use href="#sign-priority"/></svg>
           <span class="cls__badge">Klasse B96</span>
           <h3>Klasse B mit Schlüsselzahl 96</h3>
           <div class="cls__desc">
@@ -348,6 +401,7 @@
         </article>
 
         <article class="cls">
+          <svg class="cls__watermark" viewBox="0 0 100 100" aria-hidden="true"><use href="#sign-roundabout"/></svg>
           <span class="cls__badge">Klasse BE</span>
           <h3>PKW mit großem Anhänger</h3>
           <div class="cls__desc">
@@ -388,10 +442,13 @@
     </div>
   </section>
 
+  <div class="roadstrip" aria-hidden="true"></div>
+
   <!-- ===================== UNSERE RÄUME ===================== -->
   <section class="section section--soft" id="raeume">
     <div class="wrap">
       <div class="section__head reveal">
+        <svg class="headsign" viewBox="0 0 100 100" aria-hidden="true"><use href="#sign-yield"/></svg>
         <span class="eyebrow">Unsere Räume</span>
         <h2>Ein Blick in die Fahrschule</h2>
         <p class="lede">So sieht es bei uns in der Theodor-Heuss-Allee 27 aus: der Schulungsraum für den Theorieunterricht, der Empfang und die Arbeitsplätze für Anmeldung und Beratung.</p>
