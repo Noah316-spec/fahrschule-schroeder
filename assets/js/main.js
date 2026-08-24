@@ -108,10 +108,44 @@
     form.addEventListener('submit', function (e) {
       e.preventDefault();
 
-      if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-      }
+      var MELDUNGEN = {
+        nachricht: "Bitte schreibt uns kurz, worum es geht.",
+        name:      "Bitte tragt Euren Namen ein, damit wir wissen, wen wir zurückrufen.",
+        email:     "Bitte eine gültige E-Mail-Adresse eintragen, z. B. name@beispiel.de",
+        consent:   "Ohne Euer Einverständnis dürfen wir die Anfrage leider nicht bearbeiten."
+      };
+
+      var feldVon = function (el) { return el.closest(".field") || el.closest(".agree") || el.closest(".consent"); };
+
+      var loescheFehler = function () {
+        form.querySelectorAll(".has-error").forEach(function (el) { el.classList.remove("has-error"); });
+        form.querySelectorAll(".fld-error").forEach(function (el) { el.remove(); });
+      };
+
+      var zeigeFehler = function () {
+        loescheFehler();
+        var erstes = null;
+        Object.keys(MELDUNGEN).forEach(function (name) {
+          var el = form.elements[name];
+          if (!el || el.checkValidity()) return;
+          var box = feldVon(el);
+          if (!box) return;
+          box.classList.add("has-error");
+          var p = document.createElement("p");
+          p.className = "fld-error";
+          p.textContent = MELDUNGEN[name];
+          box.appendChild(p);
+          if (!erstes) erstes = el;
+        });
+        if (erstes) {
+          erstes.focus();
+          erstes.scrollIntoView({ block: "center", behavior: "smooth" });
+        }
+        return !erstes;
+      };
+
+      if (!zeigeFehler()) return;
+      loescheFehler();
 
       var val = function (name) {
         var el = form.elements[name];
