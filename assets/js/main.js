@@ -35,35 +35,6 @@
     else if (mq.addListener) mq.addListener(onMq);
   }
 
-  /* ---------- Einblenden beim Scrollen ---------- */
-  var root = document.documentElement;
-  var reveals = [].slice.call(document.querySelectorAll('.reveal'));
-
-  var revealAll = function () {
-    reveals.forEach(function (el) { el.classList.add('is-in'); });
-    root.classList.remove('js-anim');
-  };
-
-  if ('IntersectionObserver' in window && reveals.length) {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-in');
-          io.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-    reveals.forEach(function (el) { io.observe(el); });
-
-    // Sicherheitsnetz: Sollte der Observer in einer Umgebung gar nicht ausloesen,
-    // wird nach kurzer Zeit alles sichtbar geschaltet. Niemals unsichtbare Inhalte.
-    window.setTimeout(function () {
-      if (!document.querySelector('.reveal.is-in')) revealAll();
-    }, 1500);
-  } else {
-    revealAll();
-  }
-
   /* ---------- Aktiver Navigationspunkt ---------- */
   var sections = [].slice.call(document.querySelectorAll('main section[id]'));
   var navLinks = [].slice.call(document.querySelectorAll('.nav a[href^="#"]'));
@@ -86,19 +57,6 @@
     sections.forEach(function (s) { spy.observe(s); });
   }
 
-  /* ---------- Button "nach oben" ---------- */
-  var toTop = document.getElementById('toTop');
-  if (toTop) {
-    var onScroll = function () {
-      toTop.classList.toggle('is-on', window.scrollY > 700);
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-    toTop.addEventListener('click', function () {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-  }
-
   /* ---------- Kontaktformular -> E-Mail-Programm ---------- */
   var form = document.getElementById('kontaktformular');
   var status = document.getElementById('formStatus');
@@ -115,7 +73,7 @@
         consent:   "Ohne Euer Einverständnis dürfen wir die Anfrage leider nicht bearbeiten."
       };
 
-      var feldVon = function (el) { return el.closest(".field") || el.closest(".agree") || el.closest(".consent"); };
+      var feldVon = function (el) { return el.closest(".field") || el.closest(".consent"); };
 
       var loescheFehler = function () {
         form.querySelectorAll(".has-error").forEach(function (el) { el.classList.remove("has-error"); });
@@ -155,18 +113,11 @@
       var name = val('name');
       var zeilen = [
         'Name: ' + (name || '-'),
-        'Firma: ' + (val('firma') || '-'),
-        'Straße / Nr.: ' + (val('strasse') || '-'),
-        'PLZ / Ort: ' + (val('ort') || '-'),
         'Telefon: ' + (val('telefon') || '-'),
-        'Telefax: ' + (val('telefax') || '-'),
         'E-Mail: ' + (val('email') || '-'),
         '',
         'Nachricht:',
-        val('nachricht'),
-        '',
-        '--',
-        'Gesendet über das Kontaktformular auf fahrschule-ingo-schroeder.de'
+        val('nachricht')
       ];
 
       var betreff = 'Anfrage über die Website' + (name ? ' – ' + name : '');
@@ -181,58 +132,6 @@
 
       window.location.href = href;
     });
-  }
-
-  /* ---------- Lesefortschritt oben ---------- */
-  var bar = document.querySelector("#progress span");
-  if (bar) {
-    var updateBar = function () {
-      var el = document.documentElement;
-      var max = el.scrollHeight - el.clientHeight;
-      bar.style.width = (max > 0 ? (el.scrollTop / max) * 100 : 0) + "%";
-    };
-    window.addEventListener("scroll", updateBar, { passive: true });
-    window.addEventListener("resize", updateBar);
-    updateBar();
-  }
-
-  /* ---------- Verkehrszeichen im Hero: leichtes Parallax ---------- */
-  var signs = [].slice.call(document.querySelectorAll(".hsign"));
-  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  if (signs.length && !reduced && window.matchMedia("(min-width: 941px)").matches) {
-    var hero = document.querySelector(".hero");
-    var mx = 0, my = 0, sy = 0, ticking = false;
-
-    var render = function () {
-      signs.forEach(function (el) {
-        var d = parseFloat(el.getAttribute("data-depth")) || 12;
-        var x = mx * d;
-        var y = my * d + sy * (d / 22);
-        el.style.transform = "translate3d(" + x.toFixed(1) + "px," + y.toFixed(1) + "px,0)";
-      });
-      ticking = false;
-    };
-
-    var request = function () {
-      if (!ticking) { ticking = true; window.requestAnimationFrame(render); }
-    };
-
-    hero.addEventListener("mousemove", function (e) {
-      var r = hero.getBoundingClientRect();
-      mx = (e.clientX - r.left) / r.width - 0.5;
-      my = (e.clientY - r.top) / r.height - 0.5;
-      request();
-    });
-
-    hero.addEventListener("mouseleave", function () { mx = 0; my = 0; request(); });
-
-    window.addEventListener("scroll", function () {
-      sy = Math.min(window.scrollY, 900);
-      request();
-    }, { passive: true });
-
-    request();
   }
 
   /* ---------- Jahreszahl im Footer ---------- */
